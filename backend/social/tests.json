@@ -1,0 +1,22 @@
+{
+  "tests": [
+    {
+      "name": "Get chats - unauthorized",
+      "method": "POST",
+      "path": "/",
+      "body": { "action": "get_chats" },
+      "expectedStatus": 401,
+      "expectedBody": { "error": "string" },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Unknown action",
+      "method": "POST",
+      "path": "/",
+      "body": { "action": "unknown" },
+      "expectedStatus": 400,
+      "expectedBody": { "error": "string" },
+      "bodyMatcher": "partial"
+    }
+  ]
+}

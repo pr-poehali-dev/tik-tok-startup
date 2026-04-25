@@ -33,6 +33,7 @@ export async function register(params: {
 }): Promise<{ token: string; user: User }> {
   const data = await callAuth({ action: "register", ...params });
   localStorage.setItem(TOKEN_KEY, data.token!);
+  if (data.user?.id) localStorage.setItem("vspyshka_user_id", data.user.id);
   return { token: data.token!, user: data.user! };
 }
 
@@ -42,6 +43,7 @@ export async function login(params: {
 }): Promise<{ token: string; user: User }> {
   const data = await callAuth({ action: "login", ...params });
   localStorage.setItem(TOKEN_KEY, data.token!);
+  if (data.user?.id) localStorage.setItem("vspyshka_user_id", data.user.id);
   return { token: data.token!, user: data.user! };
 }
 
@@ -56,6 +58,7 @@ export function logout(): void {
   const token = localStorage.getItem(TOKEN_KEY);
   if (token) callAuth({ action: "logout", token });
   localStorage.removeItem(TOKEN_KEY);
+  localStorage.removeItem("vspyshka_user_id");
 }
 
 export function getToken(): string | null {
