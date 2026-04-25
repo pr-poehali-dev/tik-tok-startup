@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -9,6 +9,8 @@ import SearchPage from "@/components/SearchPage";
 import UploadPage from "@/components/UploadPage";
 import ChatPage from "@/components/ChatPage";
 import ProfilePage from "@/components/ProfilePage";
+import AuthPage from "@/components/AuthPage";
+import { getMe, logout, type User } from "@/lib/auth";
 import "./App.css";
 
 const queryClient = new QueryClient();
@@ -16,7 +18,32 @@ const queryClient = new QueryClient();
 type Tab = "feed" | "search" | "upload" | "chat" | "profile";
 
 function MainApp() {
+  const [user, setUser] = useState<User | null | undefined>(undefined);
   const [tab, setTab] = useState<Tab>("feed");
+
+  useEffect(() => {
+    getMe()
+      .then((u) => setUser(u))
+      .catch(() => setUser(null));
+  }, []);
+
+  if (user === undefined) {
+    return (
+      <div className="h-screen bg-background flex flex-col items-center justify-center gap-4">
+        <div
+          className="w-16 h-16 rounded-2xl flex items-center justify-center"
+          style={{ background: "linear-gradient(135deg, hsl(350,100%,55%), hsl(180,100%,45%))" }}
+        >
+          <Icon name="Play" size={28} className="text-white fill-white ml-1" />
+        </div>
+        <div className="w-6 h-6 border-2 border-white/20 border-t-[hsl(350,100%,55%)] rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <AuthPage onAuth={setUser} />;
+  }
 
   const tabs = [
     { id: "feed" as Tab, icon: "Home", label: "Лента" },
@@ -32,7 +59,7 @@ function MainApp() {
       case "search": return <SearchPage />;
       case "upload": return <UploadPage />;
       case "chat": return <ChatPage />;
-      case "profile": return <ProfilePage />;
+      case "profile": return <ProfilePage user={user} onLogout={() => { logout(); setUser(null); }} />;
     }
   };
 

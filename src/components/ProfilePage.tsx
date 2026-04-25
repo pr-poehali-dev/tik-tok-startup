@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Icon from "@/components/ui/icon";
 import { VIDEOS } from "@/data/mockData";
+import type { User } from "@/lib/auth";
 
 function formatBig(n: number): string {
   if (n >= 1000000) return (n / 1000000).toFixed(1) + "М";
@@ -8,17 +9,22 @@ function formatBig(n: number): string {
   return String(n);
 }
 
-export default function ProfilePage() {
+interface ProfilePageProps {
+  user: User;
+  onLogout: () => void;
+}
+
+export default function ProfilePage({ user: currentUser, onLogout }: ProfilePageProps) {
   const [activeTab, setActiveTab] = useState<"videos" | "liked">("videos");
 
   const user = {
-    name: "Моя страница",
-    username: "@я_в_вспышке",
-    avatar: "https://api.dicebear.com/7.x/adventurer/svg?seed=me&backgroundColor=b6e3f4",
-    bio: "Создаю контент и вдохновляю ✨ Москва",
-    followers: 4820,
-    following: 312,
-    likes: 128300,
+    name: currentUser.display_name || currentUser.username,
+    username: "@" + currentUser.username,
+    avatar: currentUser.avatar_url || `https://api.dicebear.com/7.x/adventurer/svg?seed=${currentUser.username}&backgroundColor=b6e3f4`,
+    bio: currentUser.bio || "Новый пользователь ВспышкаВидео ✨",
+    followers: currentUser.followers_count,
+    following: currentUser.following_count,
+    likes: currentUser.likes_count,
   };
 
   const stats = [
@@ -47,8 +53,8 @@ export default function ProfilePage() {
           <button className="glass rounded-full p-2">
             <Icon name="Share2" size={18} className="text-white" />
           </button>
-          <button className="glass rounded-full p-2">
-            <Icon name="Settings" size={18} className="text-white" />
+          <button onClick={onLogout} className="glass rounded-full p-2" title="Выйти">
+            <Icon name="LogOut" size={18} className="text-white" />
           </button>
         </div>
 
